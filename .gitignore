@@ -1,0 +1,8 @@
+.DS_Store
+Debug/*
+.cproject
+.project
+.settings/*
+*.exe
+*.o
+*.so
