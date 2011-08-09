@@ -18,12 +18,12 @@ using namespace std;
 
 #include <gtk-3.0/gtk/gtk.h>
 
-#include "SuperMaximo_GameFramework/headers/SMSDL.h"
-#include "SuperMaximo_GameFramework/headers/Display.h"
-#include "SuperMaximo_GameFramework/headers/Input.h"
-#include "SuperMaximo_GameFramework/headers/Utils.h"
-#include "SuperMaximo_GameFramework/headers/classes/Shader.h"
-#include "SuperMaximo_GameFramework/headers/classes/Model.h"
+#include "SuperMaximo_GameLibrary/headers/SMSDL.h"
+#include "SuperMaximo_GameLibrary/headers/Display.h"
+#include "SuperMaximo_GameLibrary/headers/Input.h"
+#include "SuperMaximo_GameLibrary/headers/Utils.h"
+#include "SuperMaximo_GameLibrary/headers/classes/Shader.h"
+#include "SuperMaximo_GameLibrary/headers/classes/Model.h"
 using namespace SuperMaximo;
 
 enum viewOrientationEnum {
