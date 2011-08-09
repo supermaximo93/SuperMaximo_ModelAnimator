@@ -482,11 +482,11 @@ void bufferObj(GLuint * vbo, Model * model, void *) {
 			count++;
 			vertexArray[count] = 1.0f;
 			count++;
-			vertexArray[count] = (*(model->triangles()))[i].surfaceNormal().x;//coords[j].normal_.x;
+			vertexArray[count] = (*(model->triangles()))[i].coords[j].normal_.x;
 			count++;
-			vertexArray[count] = (*(model->triangles()))[i].surfaceNormal().y;//(*(model->triangles()))[i].coords[j].normal_.y;
+			vertexArray[count] = (*(model->triangles()))[i].coords[j].normal_.y;
 			count++;
-			vertexArray[count] = (*(model->triangles()))[i].surfaceNormal().z;//(*(model->triangles()))[i].coords[j].normal_.z;
+			vertexArray[count] = (*(model->triangles()))[i].coords[j].normal_.z;
 			count++;
 			vertexArray[count] = (*(model->materials()))[(*(model->triangles()))[i].mtlNum].ambientColor.r;
 			count++;
