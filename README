@@ -2,4 +2,4 @@ SuperMaximo ModelAnimator
 =========================
 By Max Foster
 
-Created using SDL, OpenGL, and GTK 3.0
+A program that allows you to import a 3D model in Wavefront Obj format, rig a skeleton to it and animate it for use with the SuperMaximo GameLibrary. Created using the SuperMaximo GameLibrary (which is a layer on top of OpenGL and SDL), GLU, and GTK 3.0
