@@ -261,9 +261,9 @@ void exportSmm(string fileName = "") {
 	ofstream file;
 	file.open(fileName.c_str());
 
-	file << loadedModel->triangles()->size() << "\n";
+	file << loadedModel->vertexCount() << "\n";
 
-	unsigned arraySize = loadedModel->triangles()->size()*3*24;
+	unsigned arraySize = loadedModel->vertexCount()*24;
 	GLfloat data[arraySize];
 	glBindBuffer(GL_ARRAY_BUFFER, *modelVbo);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), &data);
