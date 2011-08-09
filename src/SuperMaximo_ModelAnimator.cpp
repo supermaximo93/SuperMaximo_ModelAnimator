@@ -1958,7 +1958,7 @@ gboolean glLoop(void*) {
 			deleteKeyframe(selectedBone, currentFrame);
 			setAnimationMarks(selectedBone);
 			setBoneRotations(currentFrame);
-		} else if ((selectedBone != NULL) && (mode == SKELETON_MODE)) {
+		} else if ((root != NULL) && (selectedBone != NULL) && (mode == SKELETON_MODE)) {
 			bone * tempBone = selectedBone;
 			selectedBone = selectedBone->parent;
 			deleteBone(tempBone);
