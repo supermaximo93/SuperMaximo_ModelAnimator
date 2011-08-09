@@ -1320,13 +1320,13 @@ void setKeyframe(bone * pBone = NULL) {
 	int frameIndex = pBone->animations[currentAnimation].frameIndex(currentFrame);
 	if (frameIndex == -1) {
 		unsigned i = 0;
-		for (; i < pBone->animations[currentAnimation].frames.size(); i++) if (currentFrame < pBone->animations[currentAnimation].frames[i].step) break;
+		for (; i < pBone->animations[currentAnimation].frames.size(); i++)
+			if ((currentFrame < pBone->animations[currentAnimation].frames[i].step) || (i+1 >=pBone->animations[currentAnimation].frames.size())) break;
 
 		if ((pBone->xRot != pBone->animations[currentAnimation].frames[i].xRot) || (pBone->yRot != pBone->animations[currentAnimation].frames[i].yRot) ||
 				(pBone->zRot != pBone->animations[currentAnimation].frames[i].zRot) || (pBone == selectedBone)) {
 			bone::keyFrame newKeyFrame = (bone::keyFrame){pBone->xRot, pBone->yRot, pBone->zRot, currentFrame};
 			pBone->animations[currentAnimation].frames.push_back(newKeyFrame);
-
 		}
 	} else {
 		pBone->animations[currentAnimation].frames[frameIndex].xRot = pBone->xRot;
@@ -2105,13 +2105,14 @@ void selectAnimation() {
 	setAnimationMarks(selectedBone);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(animationLengthSpinButton), animations[currentAnimation].length);
 	gtk_entry_set_text(GTK_ENTRY(timelineJumpEntry), "1");
+	gtk_entry_set_text(GTK_ENTRY(animationNameEntry), animations[currentAnimation].name.c_str());
 	timelineJump();
 }
 
 void addAnimation() {
 	stringstream stream(stringstream::in | stringstream::out);
 	stream.setf(ios::fixed, ios::floatfield);
-	stream << animations.size()-1;
+	stream << animations.size();
 	animations.push_back((animationDetail){"animation"+stream.str(), 60});
 	verifyBoneAnimationCounts(root);
 	updateAnimationSpinButtonRange();
