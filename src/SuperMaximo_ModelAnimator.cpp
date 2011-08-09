@@ -72,6 +72,7 @@ struct animationDetail {
 #define DOWN_KEYCODE 274
 #define RIGHT_KEYCODE 275
 #define LEFT_KEYCODE 276
+#define SPACEBAR_KEYCODE 32
 
 #define UPPER_LIMIT 0
 #define LOWER_LIMIT 1
@@ -80,7 +81,7 @@ bool executeOpenFile = false, wireframeModeEnabled = false, boneCreationEnabled 
 		falseBool = false, playAnimation = false, autoKeyEnabled = false;
 Model * loadedModel = NULL, * boneModel = NULL;
 Shader * skeletonShader, * animationShader, * boneShader, * arrowShader, * boxShader, * ringShader;
-vec2 lastMousePosition = {{0.0f}, {0.0f}};
+vec2 lastMousePosition = {{0.0f}, {0.0f}}, viewTranslation = {{0.0f}, {0.0f}};
 GtkWidget * wireframeToggleButton, * boneCreationToggleButton, * skinningToggleButton, * viewToggleButton[VIEW_ORIENTATION_ENUM_COUNT], * boneView, * boneScaleSpinButton,
 	* animationLengthSpinButton, * timelineJumpEntry, * timeline, * boneWindow, * animationWindow, * switchModeButton, * boneRotationLimitSpinButton[3][2],
 	* playAnimationToggleButton, * autoKeyToggleButton, * boneNameEntry, * animationNameEntry, * animationSelectSpinButton;
@@ -1664,6 +1665,7 @@ void handleBoneCreation() {
 					copyMatrix(IDENTITY_MATRIX, MODELVIEW_MATRIX);
 					translateMatrix(screenWidth()/2.0f, screenHeight()/2.0f, -500.0f);
 					scaleMatrix(zoom, -zoom, zoom);
+					translateMatrix(viewTranslation.x, viewTranslation.y, 0.0f);
 					rotateMatrix(xRotation, 1.0f, 0.0f, 0.0f);
 					rotateMatrix(yRotation, 0.0f, 1.0f, 0.0f);
 					for (int i = 0; i < 16; i++) {
@@ -1739,6 +1741,7 @@ void handleBoneCompletion() {
 			copyMatrix(IDENTITY_MATRIX, MODELVIEW_MATRIX);
 			translateMatrix(screenWidth()/2.0f, screenHeight()/2.0f, -500.0f);
 			scaleMatrix(zoom, -zoom, zoom);
+			translateMatrix(viewTranslation.x, viewTranslation.y, 0.0f);
 			rotateMatrix(xRotation, 1.0f, 0.0f, 0.0f);
 			rotateMatrix(yRotation, 0.0f, 1.0f, 0.0f);
 			for (int i = 0; i < 16; i++) {
@@ -1788,6 +1791,7 @@ void selectVertices(vec2 boxStartPosition) {
 		copyMatrix(IDENTITY_MATRIX, MODELVIEW_MATRIX);
 		translateMatrix(screenWidth()/2.0f, screenHeight()/2.0f, -500.0f);
 		scaleMatrix(zoom, -zoom, zoom);
+		translateMatrix(viewTranslation.x, viewTranslation.y, 0.0f);
 		rotateMatrix(xRotation, 1.0f, 0.0f, 0.0f);
 		rotateMatrix(yRotation, 0.0f, 1.0f, 0.0f);
 		for (short i = 0; i < 16; i++) {
@@ -1918,7 +1922,7 @@ gboolean glLoop(void*) {
 		return false;
 	}
 
-	//for (unsigned i = 0; i < 320; i++) if (keyPressed(i)) cout << i << endl;
+	for (unsigned i = 0; i < 320; i++) if (keyPressed(i)) cout << i << endl;
 
 	bool showArrow = false, showArrowParent, showRing = false;
 	axisEnum axis;
@@ -1940,6 +1944,14 @@ gboolean glLoop(void*) {
 	} else handleBoneCreation();
 
 	handleBoneCompletion();
+
+	if (mouseRight()) {
+		vec2 amountMoved = mouseMovedAmount();
+		viewTranslation.x += amountMoved.x*0.3;
+		viewTranslation.y -= amountMoved.y*0.3;
+	} else if (keyPressed(SPACEBAR_KEYCODE)) {
+		viewTranslation = (vec2){{0.0f}, {0.0f}};
+	}
 
 	if (keyPressed(127)) {
 		if (mode == ANIMATION_MODE) {
@@ -1967,6 +1979,7 @@ gboolean glLoop(void*) {
 
 	copyMatrix(ORTHOGRAPHIC_MATRIX, PROJECTION_MATRIX);
 	pushMatrix();
+		translateMatrix(viewTranslation.x, viewTranslation.y, 0.0f);
 		rotateMatrix(xRotation, 1.0f, 0.0f, 0.0f);
 		rotateMatrix(yRotation, 0.0f, 1.0f, 0.0f);
 
