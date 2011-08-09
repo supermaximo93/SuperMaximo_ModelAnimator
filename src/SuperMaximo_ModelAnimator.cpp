@@ -1922,7 +1922,7 @@ gboolean glLoop(void*) {
 		return false;
 	}
 
-	for (unsigned i = 0; i < 320; i++) if (keyPressed(i)) cout << i << endl;
+	//for (unsigned i = 0; i < 320; i++) if (keyPressed(i)) cout << i << endl;
 
 	bool showArrow = false, showArrowParent, showRing = false;
 	axisEnum axis;
