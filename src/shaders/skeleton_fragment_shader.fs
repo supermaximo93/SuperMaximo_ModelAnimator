@@ -20,7 +20,7 @@ void main(void) {
   fragColor = vec4(fragAmbientColor, fragAlpha);
   fragColor += vec4(fragDiffuseColor, fragAlpha);
   fragColor *= mix(vec4(1.0), texture2DArray(colorMap, vec3(fragTexCoords.st, fragMtlNum)), fragHasTexture);
-  fragColor = mix(fragColor, vec4(0.0, 0.7, 0.0, 1.0), polygonModePoint);
+  fragColor = mix(fragColor, mix(vec4(0.0, 0.7, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), clamp(fragBoneId+1.0, 0.0, 1.0)), polygonModePoint);
 
   fragColor = mix(mix(fragColor, vec4(1.0, 0.0, 0.0, 1.0), polygonModePoint), fragColor, clamp(abs(fragBoneId-selectedBoneId), 0.0, 1.0));
 }
