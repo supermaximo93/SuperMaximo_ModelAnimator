@@ -61,6 +61,8 @@ struct animationDetail {
 #define INITIAL_MODEL_Z -10.0f
 #define MOUSE_MIDDLE_BORDER 15
 #define SHORTCUT_PRESS_DELAY 10.0f
+#define BONE_CREATE_DELAY 10.0f
+#define BONE_DELETE_DELAY 10.0f
 #define DEFAULT_ZOOM 8.0f
 
 #define CONTROL_KEYCODE 306
@@ -87,7 +89,7 @@ GtkWidget * wireframeToggleButton, * boneCreationToggleButton, * skinningToggleB
 	* playAnimationToggleButton, * autoKeyToggleButton, * boneNameEntry, * animationNameEntry, * animationSelectSpinButton;
 gulong boneCreationToggleHandler, skinningToggleHandler, viewToggleHandler[VIEW_ORIENTATION_ENUM_COUNT], boneRotationLimitSpinHandler[3][2], playAnimationToggleHandler,
 	autoKeyToggleHandler;
-float timeSinceShortcutPressed = SHORTCUT_PRESS_DELAY, xRotation = 0.0f, yRotation = 0.0f, zoom = DEFAULT_ZOOM, boneScale = 1.0f;
+float xRotation = 0.0f, yRotation = 0.0f, zoom = DEFAULT_ZOOM, boneScale = 1.0f;
 bone * root = NULL, * selectedBone = NULL;
 vector<bone *> boneList;
 viewOrientationEnum viewOrientation, viewOrientationArr[VIEW_ORIENTATION_ENUM_COUNT] = {TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK, FREE};
@@ -1069,7 +1071,10 @@ void deleteBone(bone * pBone) {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	if (pBone == root) root = NULL;
+	if (pBone == root) {
+		gtk_entry_set_text(GTK_ENTRY(boneNameEntry), "");
+		root = NULL;
+	}
 	delete pBone;
 }
 
@@ -1459,6 +1464,8 @@ void drawRing(float x, float y, float z, axisEnum axis) {
 }
 
 void handleControlPressed(bool * showArrow, bool * showArrowParent, axisEnum * arrowAxis) {
+	static float timeSinceShortcutPressed = SHORTCUT_PRESS_DELAY;
+
 	if (timeSinceShortcutPressed < SHORTCUT_PRESS_DELAY) timeSinceShortcutPressed += compensation(); else {
 		if (keyPressed('o')) {
 			flagExecuteOpenFile();
@@ -1651,6 +1658,12 @@ void handleAltPressed(bool * showRing, axisEnum * ringAxis) {
 }
 
 void handleBoneCreation() {
+	static float timeSinceBoneCreated = BONE_CREATE_DELAY;
+	if (timeSinceBoneCreated < BONE_CREATE_DELAY) {
+		timeSinceBoneCreated += compensation();
+		return;
+	}
+
 	if (mouseLeft() && boneCreationEnabled) {
 		if (!creatingBone) {
 			creatingBone = true;
@@ -1725,7 +1738,7 @@ void handleBoneCreation() {
 			verifyBoneAnimationCounts(selectedBone);
 			setRotationLimitValues(selectedBone);
 
-			SuperMaximo::wait(200);
+			timeSinceBoneCreated = 0.0f;
 		} else {
 			creatingBone = false;
 		}
@@ -1959,10 +1972,13 @@ gboolean glLoop(void*) {
 			setAnimationMarks(selectedBone);
 			setBoneRotations(currentFrame);
 		} else if ((root != NULL) && (selectedBone != NULL) && (mode == SKELETON_MODE)) {
-			bone * tempBone = selectedBone;
-			selectedBone = selectedBone->parent;
-			deleteBone(tempBone);
-			SuperMaximo::wait(200);
+			static float timeSinceBoneDeleted = BONE_DELETE_DELAY;
+			if (timeSinceBoneDeleted < BONE_DELETE_DELAY) timeSinceBoneDeleted += compensation(); else {
+				bone * tempBone = selectedBone;
+				selectedBone = selectedBone->parent;
+				deleteBone(tempBone);
+				timeSinceBoneDeleted = 0.0f;
+			}
 		}
 	}
 
