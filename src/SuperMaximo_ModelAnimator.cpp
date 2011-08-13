@@ -79,20 +79,23 @@ struct animationDetail {
 #define UPPER_LIMIT 0
 #define LOWER_LIMIT 1
 
-bool executeOpenFile = false, wireframeModeEnabled = false, boneCreationEnabled = false, skinningEnabled = false, creatingBone = false, trueBool = true,
-		falseBool = false, playAnimation = false, autoKeyEnabled = false;
+bool executeOpenFile = false, wireframeModeEnabled = false, boneCreationEnabled = false, skinningEnabled = false,
+		creatingBone = false, trueBool = true, falseBool = false, playAnimation = false, autoKeyEnabled = false;
 Model * loadedModel = NULL, * boneModel = NULL;
 Shader * skeletonShader, * animationShader, * boneShader, * arrowShader, * boxShader, * ringShader;
 vec2 lastMousePosition = {{0.0f}, {0.0f}}, viewTranslation = {{0.0f}, {0.0f}};
-GtkWidget * wireframeToggleButton, * boneCreationToggleButton, * skinningToggleButton, * viewToggleButton[VIEW_ORIENTATION_ENUM_COUNT], * boneView, * boneScaleSpinButton,
-	* animationLengthSpinButton, * timelineJumpEntry, * timeline, * boneWindow, * animationWindow, * switchModeButton, * boneRotationLimitSpinButton[3][2],
-	* playAnimationToggleButton, * autoKeyToggleButton, * boneNameEntry, * animationNameEntry, * animationSelectSpinButton;
-gulong boneCreationToggleHandler, skinningToggleHandler, viewToggleHandler[VIEW_ORIENTATION_ENUM_COUNT], boneRotationLimitSpinHandler[3][2], playAnimationToggleHandler,
-	autoKeyToggleHandler;
+GtkWidget * wireframeToggleButton, * boneCreationToggleButton, * skinningToggleButton,
+	* viewToggleButton[VIEW_ORIENTATION_ENUM_COUNT], * boneView, * boneScaleSpinButton, * animationLengthSpinButton,
+	* timelineJumpEntry, * timeline, * boneWindow, * animationWindow, * switchModeButton,
+	* boneRotationLimitSpinButton[3][2], * playAnimationToggleButton, * autoKeyToggleButton, * boneNameEntry,
+	* animationNameEntry, * animationSelectSpinButton;
+gulong boneCreationToggleHandler, skinningToggleHandler, viewToggleHandler[VIEW_ORIENTATION_ENUM_COUNT],
+	boneRotationLimitSpinHandler[3][2], playAnimationToggleHandler, autoKeyToggleHandler;
 float xRotation = 0.0f, yRotation = 0.0f, zoom = DEFAULT_ZOOM, boneScale = 1.0f;
 bone * root = NULL, * selectedBone = NULL;
 vector<bone *> boneList;
-viewOrientationEnum viewOrientation, viewOrientationArr[VIEW_ORIENTATION_ENUM_COUNT] = {TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK, FREE};
+viewOrientationEnum viewOrientation,
+	viewOrientationArr[VIEW_ORIENTATION_ENUM_COUNT] = {TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK, FREE};
 GtkTreeStore * boneStore;
 vector<boneIteratorAssociation> boneIteratorAssociations;
 GtkTreeSelection * boneSelect;
@@ -154,8 +157,9 @@ void resetAll() {
 }
 
 string getFileNameOpen() {
-	GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL), * dialog = gtk_file_chooser_dialog_new ("Open File", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_OPEN,
-			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+	GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL),
+			* dialog = gtk_file_chooser_dialog_new("Open File", GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_OPEN,
+					GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
 
 	GtkFileFilter * filter = gtk_file_filter_new();
 	gtk_file_filter_add_pattern(filter, "*.obj");
@@ -180,8 +184,9 @@ string getFileNameOpen() {
 string getFileNameSave(string caption = "") {
 	if (caption == "") caption = "Save File";
 
-	GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL), * dialog = gtk_file_chooser_dialog_new (caption.c_str(), GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_SAVE,
-			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
+	GtkWidget * window = gtk_window_new(GTK_WINDOW_TOPLEVEL),
+			* dialog = gtk_file_chooser_dialog_new(caption.c_str(), GTK_WINDOW(window), GTK_FILE_CHOOSER_ACTION_SAVE,
+					GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT, NULL);
 
 	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
 		string fileName;
@@ -232,7 +237,8 @@ void exportSms(string fileName = "") {
 void exportSma(string fileName = "") {
 	if (root == NULL) return;
 
-	if (fileName == "") fileName = getFileNameSave("Saving SuperMaximo Animation ("+animations[currentAnimation].name+")");
+	if (fileName == "") fileName =
+			getFileNameSave("Saving SuperMaximo Animation ("+animations[currentAnimation].name+")");
 
 	if (lowerCase(rightStr(fileName, 4)) != ".sma") fileName += ".sma";
 	ofstream file;
@@ -403,13 +409,15 @@ void loadSms(string fileName) {
 			}
 
 			boneIteratorAssociations.push_back((boneIteratorAssociation){selectedBone});
-			gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator), &(boneIteratorAssociations[i].iterator));
+			gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator),
+					&(boneIteratorAssociations[i].iterator));
 		}
 		selectedBone->xRot = selectedBone->yRot = selectedBone->zRot = 0.0f;
 
 		gtk_tree_store_set(boneStore, &(boneIteratorAssociations.back().iterator), 0, selectedBone->name.c_str(), -1);
 
-		GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore), &(boneIteratorAssociations.back().iterator));
+		GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore),
+				&(boneIteratorAssociations.back().iterator));
 		gtk_tree_view_expand_to_path(GTK_TREE_VIEW(boneView), tempPath);
 		gtk_tree_path_free(tempPath);
 		gtk_tree_selection_select_iter(boneSelect, &(boneIteratorAssociations.back().iterator));
@@ -531,16 +539,26 @@ void bufferObj(GLuint * vbo, Model * model, void *) {
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(VERTEX_ATTRIBUTE, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, 0);
-	glVertexAttribPointer(NORMAL_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*4));
-	glVertexAttribPointer(COLOR0_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*7));
-	glVertexAttribPointer(COLOR1_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*10));
-	glVertexAttribPointer(COLOR2_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*13));
-	glVertexAttribPointer(TEXTURE0_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*16));
-	glVertexAttribPointer(EXTRA0_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*19));
-	glVertexAttribPointer(EXTRA1_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*20));
-	glVertexAttribPointer(EXTRA2_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*21));
-	glVertexAttribPointer(EXTRA3_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*22));
-	glVertexAttribPointer(EXTRA4_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, (const GLvoid*)(sizeof(GLfloat)*23));
+	glVertexAttribPointer(NORMAL_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*4));
+	glVertexAttribPointer(COLOR0_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*7));
+	glVertexAttribPointer(COLOR1_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*10));
+	glVertexAttribPointer(COLOR2_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*13));
+	glVertexAttribPointer(TEXTURE0_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*16));
+	glVertexAttribPointer(EXTRA0_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*19));
+	glVertexAttribPointer(EXTRA1_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*20));
+	glVertexAttribPointer(EXTRA2_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*21));
+	glVertexAttribPointer(EXTRA3_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*22));
+	glVertexAttribPointer(EXTRA4_ATTRIBUTE, 1, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
+			(const GLvoid*)(sizeof(GLfloat)*23));
 
 	glEnableVertexAttribArray(VERTEX_ATTRIBUTE);
 	glEnableVertexAttribArray(NORMAL_ATTRIBUTE);
@@ -577,13 +595,15 @@ void loadBonesFromModel() {
 			}
 
 			boneIteratorAssociations.push_back((boneIteratorAssociation){selectedBone});
-			gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator), &(boneIteratorAssociations[i].iterator));
+			gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator),
+					&(boneIteratorAssociations[i].iterator));
 		}
 		selectedBone->xRot = selectedBone->yRot = selectedBone->zRot = 0.0f;
 
 		gtk_tree_store_set(boneStore, &(boneIteratorAssociations.back().iterator), 0, selectedBone->name.c_str(), -1);
 
-		GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore), &(boneIteratorAssociations.back().iterator));
+		GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore),
+				&(boneIteratorAssociations.back().iterator));
 		gtk_tree_view_expand_to_path(GTK_TREE_VIEW(boneView), tempPath);
 		gtk_tree_path_free(tempPath);
 		gtk_tree_selection_select_iter(boneSelect, &(boneIteratorAssociations.back().iterator));
@@ -594,7 +614,8 @@ void loadBonesFromModel() {
 		setRotationLimitValues(selectedBone);
 		if (animations.size() > 0) animations.clear();
 		for (unsigned i = 0; i < selectedBone->animations.size(); i++)
-			animations.push_back((animationDetail){selectedBone->animations[i].name, selectedBone->animations[i].length});
+			animations.push_back((animationDetail){selectedBone->animations[i].name,
+				selectedBone->animations[i].length});
 	}
 }
 
@@ -602,22 +623,26 @@ void openFile() {
 	string fileName = getFileNameOpen();
 	if (fileName != "") {
 		string tempStr = rightStr(fileName, 4);
-		if ((tempStr == ".obj") || (tempStr == ".smo") || (tempStr == ".smm") || (tempStr == ".sms") || (tempStr == ".sma")) {
+		if ((tempStr == ".obj") || (tempStr == ".smo") || (tempStr == ".smm") || (tempStr == ".sms")
+				|| (tempStr == ".sma")) {
 			int pos = fileName.find_last_of("/")+1;
 			switch (tempStr[3]) {
 			case 'j':
 				if (loadedModel != NULL) delete loadedModel;
-				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60, DYNAMIC_DRAW, bufferObj);
+				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60,
+						DYNAMIC_DRAW, bufferObj);
 				break;
 			case 'o':
 				if (loadedModel != NULL) delete loadedModel;
-				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60, DYNAMIC_DRAW);
+				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60,
+						DYNAMIC_DRAW);
 				modelVbo = loadedModel->vboPointer();
 				loadBonesFromModel();
 				break;
 			case 'm':
 				if (loadedModel != NULL) delete loadedModel;
-				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60, DYNAMIC_DRAW);
+				loadedModel = new Model("model", leftStr(fileName, pos), rightStr(fileName, fileName.size()-pos), 60,
+						DYNAMIC_DRAW);
 				modelVbo = loadedModel->vboPointer();
 				break;
 			case 's':
@@ -731,18 +756,21 @@ void createGlWindow() {
 	setClearColor(0.3, 0.3, 0.3, 1.0);
 	initInput();
 
-	boneShader = new Shader("boneShader", "shaders/bone_vertex_shader.vs", "shaders/bone_fragment_shader.fs", 10, VERTEX_ATTRIBUTE, "vertex",
-			NORMAL_ATTRIBUTE, "normal", COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE, "diffuseColor", COLOR2_ATTRIBUTE, "specularColor", TEXTURE0_ATTRIBUTE,
-			"texCoords", EXTRA0_ATTRIBUTE, "mtlNum", EXTRA1_ATTRIBUTE, "hasTexture", EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha");
+	boneShader = new Shader("boneShader", "shaders/bone_vertex_shader.vs", "shaders/bone_fragment_shader.fs", 10,
+			VERTEX_ATTRIBUTE, "vertex", NORMAL_ATTRIBUTE, "normal", COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE,
+			"diffuseColor", COLOR2_ATTRIBUTE, "specularColor", TEXTURE0_ATTRIBUTE, "texCoords", EXTRA0_ATTRIBUTE,
+			"mtlNum", EXTRA1_ATTRIBUTE, "hasTexture", EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha");
 	boneShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	boneShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	boneShader->setUniformLocation(TEXSAMPLER_LOCATION, "endVertex");
 	boneShader->setUniformLocation(EXTRA0_LOCATION, "boneModelviewMatrix");
 	boneShader->setUniformLocation(EXTRA1_LOCATION, "selected");
 
-	skeletonShader = new Shader("skeletonShader", "shaders/skeleton_vertex_shader.vs", "shaders/skeleton_fragment_shader.fs", 10, VERTEX_ATTRIBUTE, "vertex",
-			NORMAL_ATTRIBUTE, "normal", COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE, "diffuseColor", COLOR2_ATTRIBUTE, "specularColor", TEXTURE0_ATTRIBUTE,
-			"texCoords", EXTRA0_ATTRIBUTE, "mtlNum", EXTRA1_ATTRIBUTE, "hasTexture", EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha", EXTRA4_ATTRIBUTE, "boneId");
+	skeletonShader = new Shader("skeletonShader", "shaders/skeleton_vertex_shader.vs",
+			"shaders/skeleton_fragment_shader.fs", 10, VERTEX_ATTRIBUTE, "vertex", NORMAL_ATTRIBUTE, "normal",
+			COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE, "diffuseColor", COLOR2_ATTRIBUTE, "specularColor",
+			TEXTURE0_ATTRIBUTE, "texCoords", EXTRA0_ATTRIBUTE, "mtlNum", EXTRA1_ATTRIBUTE, "hasTexture",
+			EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha", EXTRA4_ATTRIBUTE, "boneId");
 	skeletonShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	skeletonShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	skeletonShader->setUniformLocation(TEXSAMPLER_LOCATION, "colorMap");
@@ -751,28 +779,33 @@ void createGlWindow() {
 	skeletonShader->setUniformLocation(EXTRA2_LOCATION, "polygonModePoint");
 	skeletonShader->bind();
 
-	animationShader = new Shader("animationShader", "shaders/animation_vertex_shader.vs", "shaders/animation_fragment_shader.fs", 10, VERTEX_ATTRIBUTE, "vertex",
-			NORMAL_ATTRIBUTE, "normal", COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE, "diffuseColor", COLOR2_ATTRIBUTE, "specularColor", TEXTURE0_ATTRIBUTE,
-			"texCoords", EXTRA0_ATTRIBUTE, "mtlNum", EXTRA1_ATTRIBUTE, "hasTexture", EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha", EXTRA4_ATTRIBUTE, "boneId");
+	animationShader = new Shader("animationShader", "shaders/animation_vertex_shader.vs",
+			"shaders/animation_fragment_shader.fs", 10, VERTEX_ATTRIBUTE, "vertex", NORMAL_ATTRIBUTE, "normal",
+			COLOR0_ATTRIBUTE, "ambientColor", COLOR1_ATTRIBUTE, "diffuseColor", COLOR2_ATTRIBUTE, "specularColor",
+			TEXTURE0_ATTRIBUTE, "texCoords", EXTRA0_ATTRIBUTE, "mtlNum", EXTRA1_ATTRIBUTE, "hasTexture",
+			EXTRA2_ATTRIBUTE, "shininess", EXTRA3_ATTRIBUTE, "alpha", EXTRA4_ATTRIBUTE, "boneId");
 	animationShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	animationShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	animationShader->setUniformLocation(TEXSAMPLER_LOCATION, "colorMap");
 	animationShader->setUniformLocation(EXTRA0_LOCATION, "boneModelviewMatrix");
 
-	arrowShader = new Shader("arrowShader", "shaders/arrow_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1, VERTEX_ATTRIBUTE, "vertex");
+	arrowShader = new Shader("arrowShader", "shaders/arrow_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1,
+			VERTEX_ATTRIBUTE, "vertex");
 	arrowShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	arrowShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	arrowShader->setUniformLocation(TEXSAMPLER_LOCATION, "color");
 	arrowShader->setUniformLocation(EXTRA0_LOCATION, "arrowLength");
 
-	boxShader = new Shader("boxShader", "shaders/box_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1, VERTEX_ATTRIBUTE, "vertex");
+	boxShader = new Shader("boxShader", "shaders/box_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1,
+			VERTEX_ATTRIBUTE, "vertex");
 	boxShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	boxShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	boxShader->setUniformLocation(TEXSAMPLER_LOCATION, "color");
 	boxShader->setUniformLocation(EXTRA0_LOCATION, "startPosition");
 	boxShader->setUniformLocation(EXTRA1_LOCATION, "mousePosition");
 
-	ringShader = new Shader("ringShader", "shaders/ring_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1, VERTEX_ATTRIBUTE, "vertex");
+	ringShader = new Shader("ringShader", "shaders/ring_vertex_shader.vs", "shaders/arrow_fragment_shader.fs", 1,
+			VERTEX_ATTRIBUTE, "vertex");
 	ringShader->setUniformLocation(MODELVIEW_LOCATION, "modelviewMatrix");
 	ringShader->setUniformLocation(PROJECTION_LOCATION, "projectionMatrix");
 	ringShader->setUniformLocation(TEXSAMPLER_LOCATION, "color");
@@ -887,9 +920,11 @@ void drawBone(bone * pBone) {
 		translateMatrix(-pBone->x, -pBone->y, -pBone->z);
 
 		boneShader->use();
-		boneShader->setUniform4(TEXSAMPLER_LOCATION, pBone->x+pBone->endX, pBone->y+pBone->endY, pBone->z+pBone->endZ, 1.0f);
+		boneShader->setUniform4(TEXSAMPLER_LOCATION, pBone->x+pBone->endX, pBone->y+pBone->endY, pBone->z+pBone->endZ,
+				1.0f);
 		boneShader->setUniform16(EXTRA0_LOCATION, getMatrix(MODELVIEW_MATRIX));
-		if (pBone == selectedBone) boneShader->setUniform1(EXTRA1_LOCATION, 1); else boneShader->setUniform1(EXTRA1_LOCATION, 0);
+		if (pBone == selectedBone) boneShader->setUniform1(EXTRA1_LOCATION, 1);
+			else boneShader->setUniform1(EXTRA1_LOCATION, 0);
 
 		boneModel->draw(pBone->x, pBone->y, pBone->z, xRot, yRot, zRot-90.0f, boneScale, boneScale, boneScale);
 
@@ -908,19 +943,27 @@ unsigned countBones(bone * startBone) {
 
 void setRotationLimitValues(bone * pBone) {
 	for (short i = 0; i < 3; i++) {
-		for (short j = 0; j < 2; j++) g_signal_handler_block(boneRotationLimitSpinButton[i][j], boneRotationLimitSpinHandler[i][j]);
+		for (short j = 0; j < 2; j++)
+			g_signal_handler_block(boneRotationLimitSpinButton[i][j], boneRotationLimitSpinHandler[i][j]);
 	}
 
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]), pBone->rotationUpperLimit.x);
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]), pBone->rotationUpperLimit.y);
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]), pBone->rotationUpperLimit.z);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]),
+			pBone->rotationUpperLimit.x);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]),
+			pBone->rotationUpperLimit.y);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]),
+			pBone->rotationUpperLimit.z);
 
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]), pBone->rotationLowerLimit.x);
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]), pBone->rotationLowerLimit.y);
-	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]), pBone->rotationLowerLimit.z);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]),
+			pBone->rotationLowerLimit.x);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]),
+			pBone->rotationLowerLimit.y);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]),
+			pBone->rotationLowerLimit.z);
 
 	for (short i = 0; i < 3; i++) {
-		for (short j = 0; j < 2; j++) g_signal_handler_unblock(boneRotationLimitSpinButton[i][j], boneRotationLimitSpinHandler[i][j]);
+		for (short j = 0; j < 2; j++)
+			g_signal_handler_unblock(boneRotationLimitSpinButton[i][j], boneRotationLimitSpinHandler[i][j]);
 	}
 }
 
@@ -940,9 +983,16 @@ void setBoneRotations(float frame, bone * pBone = NULL) {
 			previousFrame = pBone->animations[currentAnimation].frames[i-1];
 			nextFrame = pBone->animations[currentAnimation].frames[i];
 
-			float xDiff, yDiff, zDiff, xDiff1 = nextFrame.xRot-previousFrame.xRot, yDiff1 = nextFrame.yRot-previousFrame.yRot, zDiff1 = nextFrame.zRot-previousFrame.zRot,
-					xDiff2 = (360.0f-abs(previousFrame.xRot))-abs(nextFrame.xRot), yDiff2 = (360.0f-abs(previousFrame.yRot))-abs(nextFrame.yRot),
-					zDiff2 = (360.0f-abs(previousFrame.zRot))-abs(nextFrame.zRot), stepDiff = nextFrame.step-previousFrame.step;
+			float xDiff, yDiff, zDiff,
+				xDiff1 = nextFrame.xRot-previousFrame.xRot,
+				yDiff1 = nextFrame.yRot-previousFrame.yRot,
+				zDiff1 = nextFrame.zRot-previousFrame.zRot,
+
+				xDiff2 = (360.0f-abs(previousFrame.xRot))-abs(nextFrame.xRot),
+				yDiff2 = (360.0f-abs(previousFrame.yRot))-abs(nextFrame.yRot),
+				zDiff2 = (360.0f-abs(previousFrame.zRot))-abs(nextFrame.zRot),
+
+				stepDiff = nextFrame.step-previousFrame.step;
 
 			xDiff = (abs(xDiff1) < xDiff2) ? xDiff1 : ((previousFrame.xRot < 0.0f) ? -xDiff2 : xDiff2);
 			yDiff = (abs(yDiff1) < yDiff2) ? yDiff1 : ((previousFrame.yRot < 0.0f) ? -yDiff2 : yDiff2);
@@ -1061,7 +1111,8 @@ void deleteBone(bone * pBone) {
 					for (unsigned k = 0; k < oldIds.size(); k++) {
 						if (data == oldIds[k]) {
 							data = newIds[k];
-							glBufferSubData(GL_ARRAY_BUFFER, sizeof(GLfloat)*((i*24*3)+(j*24)+23), sizeof(GLfloat), &data);
+							glBufferSubData(GL_ARRAY_BUFFER, sizeof(GLfloat)*((i*24*3)+(j*24)+23), sizeof(GLfloat),
+									&data);
 							break;
 						}
 					}
@@ -1104,7 +1155,8 @@ void setAnimationMarks(bone * pBone) {
 	if ((mode != ANIMATION_MODE) || pBone == NULL) return;
 	gtk_scale_clear_marks(GTK_SCALE(timeline));
 	for (unsigned i = 0; i < pBone->animations[currentAnimation].frames.size(); i++)
-		gtk_scale_add_mark(GTK_SCALE(timeline), pBone->animations[currentAnimation].frames[i].step, GTK_POS_BOTTOM, NULL);
+		gtk_scale_add_mark(GTK_SCALE(timeline), pBone->animations[currentAnimation].frames[i].step, GTK_POS_BOTTOM,
+				NULL);
 }
 
 void selectBone(GtkTreeSelection * selection) {
@@ -1114,7 +1166,8 @@ void selectBone(GtkTreeSelection * selection) {
 		string iteratorPath = gIteratorPath;
 		g_free(gIteratorPath);
 		for (unsigned i = 0; i < boneIteratorAssociations.size(); i++) {
-			gchar * gTempPath = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(boneStore), &(boneIteratorAssociations[i].iterator));
+			gchar * gTempPath = gtk_tree_model_get_string_from_iter(GTK_TREE_MODEL(boneStore),
+					&(boneIteratorAssociations[i].iterator));
 			string tempPath = gTempPath;
 			g_free(gTempPath);
 			if (tempPath == iteratorPath) {
@@ -1152,7 +1205,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 	int frameIndex = startBone->animations[currentAnimation].frameIndex(frame);
 
 	if ((startBone->rotationUpperLimit.x == 180.0f) && (startBone->rotationLowerLimit.x == -180.0f)) {
-		if (startBone->xRot > 180.0f) startBone->xRot -= 360.0f; else if (startBone->xRot < -180.0f) startBone->xRot += 360.0f;
+		if (startBone->xRot > 180.0f) startBone->xRot -= 360.0f;
+			else if (startBone->xRot < -180.0f) startBone->xRot += 360.0f;
 	}
 	if (startBone->xRot > startBone->rotationUpperLimit.x) {
 		if (startBone->parent != NULL) {
@@ -1161,7 +1215,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].xRot = startBone->parent->xRot;
@@ -1169,7 +1224,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->xRot = startBone->rotationUpperLimit.x;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].xRot = startBone->xRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].xRot = startBone->xRot;
 
 	} else if (startBone->xRot < startBone->rotationLowerLimit.x) {
 		if (startBone->parent != NULL) {
@@ -1178,7 +1234,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].xRot = startBone->parent->xRot;
@@ -1186,12 +1243,14 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->xRot = startBone->rotationLowerLimit.x;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].xRot = startBone->xRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].xRot = startBone->xRot;
 	}
 
 
 	if ((startBone->rotationUpperLimit.y == 180.0f) && (startBone->rotationLowerLimit.y == -180.0f)) {
-		if (startBone->yRot > 180.0f) startBone->yRot -= 360.0f; else if (startBone->yRot < -180.0f) startBone->yRot += 360.0f;
+		if (startBone->yRot > 180.0f) startBone->yRot -= 360.0f;
+			else if (startBone->yRot < -180.0f) startBone->yRot += 360.0f;
 	}
 	if (startBone->yRot > startBone->rotationUpperLimit.y) {
 		if (startBone->parent != NULL) {
@@ -1200,7 +1259,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].yRot = startBone->parent->yRot;
@@ -1208,7 +1268,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->yRot = startBone->rotationUpperLimit.y;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].yRot = startBone->yRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].yRot = startBone->yRot;
 
 	} else if (startBone->yRot < startBone->rotationLowerLimit.y) {
 		if (startBone->parent != NULL) {
@@ -1217,7 +1278,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].yRot = startBone->parent->yRot;
@@ -1225,12 +1287,14 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->yRot = startBone->rotationLowerLimit.y;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].yRot = startBone->yRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].yRot = startBone->yRot;
 	}
 
 
 	if ((startBone->rotationUpperLimit.z == 180.0f) && (startBone->rotationLowerLimit.z == -180.0f)) {
-		if (startBone->zRot > 180.0f) startBone->zRot -= 360.0f; else if (startBone->zRot < -180.0f) startBone->zRot += 360.0f;
+		if (startBone->zRot > 180.0f) startBone->zRot -= 360.0f;
+			else if (startBone->zRot < -180.0f) startBone->zRot += 360.0f;
 	}
 	if (startBone->zRot > startBone->rotationUpperLimit.z) {
 		if (startBone->parent != NULL) {
@@ -1239,7 +1303,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].zRot = startBone->parent->zRot;
@@ -1247,7 +1312,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->zRot = startBone->rotationUpperLimit.z;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].zRot = startBone->zRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].zRot = startBone->zRot;
 
 	} else if (startBone->zRot < startBone->rotationLowerLimit.z) {
 		if (startBone->parent != NULL) {
@@ -1256,7 +1322,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			if (autoKeyEnabled || (frame != currentFrame)) {
 				int frameIndex = startBone->parent->animations[currentAnimation].frameIndex(frame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						startBone->parent->xRot, startBone->parent->yRot, startBone->parent->zRot, frame};
 					startBone->parent->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					startBone->parent->animations[currentAnimation].frames[frameIndex].zRot = startBone->parent->zRot;
@@ -1264,7 +1331,8 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 			}
 		}
 		startBone->zRot = startBone->rotationLowerLimit.z;
-		if (autoKeyEnabled || (frame != currentFrame)) startBone->animations[currentAnimation].frames[frameIndex].zRot = startBone->zRot;
+		if (autoKeyEnabled || (frame != currentFrame))
+			startBone->animations[currentAnimation].frames[frameIndex].zRot = startBone->zRot;
 	}
 	if (startBone->parent != NULL) updateRotations(startBone->parent, frame);
 
@@ -1274,13 +1342,19 @@ void updateRotations(bone * startBone, unsigned frame, bool setBoneRotation = fa
 void updateBoneRotationLimits() {
 	if (selectedBone == NULL) return;
 
-	selectedBone->rotationUpperLimit.x = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]));
-	selectedBone->rotationUpperLimit.y = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]));
-	selectedBone->rotationUpperLimit.z = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]));
+	selectedBone->rotationUpperLimit.x =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]));
+	selectedBone->rotationUpperLimit.y =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]));
+	selectedBone->rotationUpperLimit.z =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]));
 
-	selectedBone->rotationLowerLimit.x = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]));
-	selectedBone->rotationLowerLimit.y = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]));
-	selectedBone->rotationLowerLimit.z = gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]));
+	selectedBone->rotationLowerLimit.x =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]));
+	selectedBone->rotationLowerLimit.y =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]));
+	selectedBone->rotationLowerLimit.z =
+			gtk_spin_button_get_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]));
 
 	for (unsigned i = 0; i < selectedBone->animations[currentAnimation].frames.size(); i++)
 		updateRotations(selectedBone, selectedBone->animations[currentAnimation].frames[i].step, true);
@@ -1309,9 +1383,11 @@ void sortBoneAnimationFrames(bone * pBone = NULL) {
 		while (pBone->animations[i].frames.size() > 0) {
 			bone::keyFrame lowestFrame = pBone->animations[i].frames.front();
 			for (unsigned j = 0; j < pBone->animations[i].frames.size(); j++) {
-				if (pBone->animations[i].frames[j].step < lowestFrame.step) lowestFrame = pBone->animations[i].frames[j];
+				if (pBone->animations[i].frames[j].step < lowestFrame.step)
+					lowestFrame = pBone->animations[i].frames[j];
 			}
-			pBone->animations[i].frames.erase(pBone->animations[i].frames.begin()+pBone->animations[i].frameIndex(lowestFrame.step));
+			pBone->animations[i].frames.erase(
+					pBone->animations[i].frames.begin()+pBone->animations[i].frameIndex(lowestFrame.step));
 			tempAnimation.frames.push_back(lowestFrame);
 		}
 		pBone->animations[i] = tempAnimation;
@@ -1326,10 +1402,12 @@ void setKeyframe(bone * pBone = NULL) {
 	if (frameIndex == -1) {
 		unsigned i = 0;
 		for (; i < pBone->animations[currentAnimation].frames.size(); i++)
-			if ((currentFrame < pBone->animations[currentAnimation].frames[i].step) || (i+1 >=pBone->animations[currentAnimation].frames.size())) break;
+			if ((currentFrame < pBone->animations[currentAnimation].frames[i].step)
+					|| (i+1 >=pBone->animations[currentAnimation].frames.size())) break;
 
-		if ((pBone->xRot != pBone->animations[currentAnimation].frames[i].xRot) || (pBone->yRot != pBone->animations[currentAnimation].frames[i].yRot) ||
-				(pBone->zRot != pBone->animations[currentAnimation].frames[i].zRot) || (pBone == selectedBone)) {
+		if ((pBone->xRot != pBone->animations[currentAnimation].frames[i].xRot)
+				|| (pBone->yRot != pBone->animations[currentAnimation].frames[i].yRot)
+				|| (pBone->zRot != pBone->animations[currentAnimation].frames[i].zRot) || (pBone == selectedBone)) {
 			bone::keyFrame newKeyFrame = (bone::keyFrame){pBone->xRot, pBone->yRot, pBone->zRot, currentFrame};
 			pBone->animations[currentAnimation].frames.push_back(newKeyFrame);
 		}
@@ -1344,7 +1422,8 @@ void setKeyframe(bone * pBone = NULL) {
 
 void deleteKeyframe(bone * pBone, unsigned frame) {
 	int frameIndex = pBone->animations[currentAnimation].frameIndex(frame);
-	if (frameIndex != -1) pBone->animations[currentAnimation].frames.erase(pBone->animations[currentAnimation].frames.begin()+frameIndex);
+	if (frameIndex != -1) pBone->animations[currentAnimation].frames.erase(
+			pBone->animations[currentAnimation].frames.begin()+frameIndex);
 }
 
 void setKeyframeCallback() {
@@ -1471,7 +1550,8 @@ void handleControlPressed(bool * showArrow, bool * showArrowParent, axisEnum * a
 			flagExecuteOpenFile();
 			timeSinceShortcutPressed = 0.0f;
 		} else if (keyPressed('w')) {
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wireframeToggleButton), !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(wireframeToggleButton)));
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wireframeToggleButton),
+					!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(wireframeToggleButton)));
 			timeSinceShortcutPressed = 0.0f;
 
 		} else if (keyPressed(ZERO_KEYCODE) || keyPressed(NUMPAD_ZERO_KEYCODE)) {
@@ -1513,10 +1593,12 @@ void handleControlPressed(bool * showArrow, bool * showArrowParent, axisEnum * a
 
 		} else if (mode == SKELETON_MODE) {
 			if (keyPressed('b')) {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(boneCreationToggleButton), !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(boneCreationToggleButton)));
+				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(boneCreationToggleButton),
+						!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(boneCreationToggleButton)));
 				timeSinceShortcutPressed = 0.0f;
 			} else if (keyPressed('k')) {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(skinningToggleButton), !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(skinningToggleButton)));
+				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(skinningToggleButton),
+						!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(skinningToggleButton)));
 				timeSinceShortcutPressed = 0.0f;
 
 			} else if (keyPressed(SHIFT_KEYCODE)) {
@@ -1580,7 +1662,8 @@ void handleControlPressed(bool * showArrow, bool * showArrowParent, axisEnum * a
 			}
 		} else if (mode == ANIMATION_MODE) {
 			if (keyPressed('p')) {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(playAnimationToggleButton), !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(playAnimationToggleButton)));
+				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(playAnimationToggleButton),
+						!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(playAnimationToggleButton)));
 				timeSinceShortcutPressed = 0.0f;
 			}
 		}
@@ -1601,7 +1684,8 @@ void handleAltPressed(bool * showRing, axisEnum * ringAxis) {
 			if (autoKeyEnabled) {
 				int frameIndex = selectedBone->animations[currentAnimation].frameIndex(currentFrame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
 					selectedBone->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					selectedBone->animations[currentAnimation].frames[frameIndex].zRot = selectedBone->zRot;
@@ -1622,7 +1706,8 @@ void handleAltPressed(bool * showRing, axisEnum * ringAxis) {
 			if (autoKeyEnabled) {
 				int frameIndex = selectedBone->animations[currentAnimation].frameIndex(currentFrame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
 					selectedBone->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					selectedBone->animations[currentAnimation].frames[frameIndex].xRot = selectedBone->xRot;
@@ -1643,7 +1728,8 @@ void handleAltPressed(bool * showRing, axisEnum * ringAxis) {
 			if (autoKeyEnabled) {
 				int frameIndex = selectedBone->animations[currentAnimation].frameIndex(currentFrame);
 				if (frameIndex == -1) {
-					bone::keyFrame tempFrame = (bone::keyFrame){selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
+					bone::keyFrame tempFrame = (bone::keyFrame){
+						selectedBone->xRot, selectedBone->yRot, selectedBone->zRot, currentFrame};
 					selectedBone->animations[currentAnimation].frames.push_back(tempFrame);
 				} else {
 					selectedBone->animations[currentAnimation].frames[frameIndex].yRot = selectedBone->yRot;
@@ -1727,11 +1813,14 @@ void handleBoneCreation() {
 				}
 
 				boneIteratorAssociations.push_back((boneIteratorAssociation){selectedBone});
-				gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator), &(boneIteratorAssociations[i].iterator));
+				gtk_tree_store_append(boneStore, &(boneIteratorAssociations.back().iterator),
+						&(boneIteratorAssociations[i].iterator));
 			}
-			gtk_tree_store_set(boneStore, &(boneIteratorAssociations.back().iterator), 0, selectedBone->name.c_str(), -1);
+			gtk_tree_store_set(boneStore, &(boneIteratorAssociations.back().iterator), 0, selectedBone->name.c_str(),
+					-1);
 
-			GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore), &(boneIteratorAssociations.back().iterator));
+			GtkTreePath * tempPath = gtk_tree_model_get_path(GTK_TREE_MODEL(boneStore),
+					&(boneIteratorAssociations.back().iterator));
 			gtk_tree_view_expand_to_path(GTK_TREE_VIEW(boneView), tempPath);
 			gtk_tree_path_free(tempPath);
 			gtk_tree_selection_select_iter(boneSelect, &(boneIteratorAssociations.back().iterator));
@@ -1835,8 +1924,8 @@ void selectVertices(vec2 boxStartPosition) {
 				loY = screenHeight()-mouseY();
 			}
 
-			gluProject((*(loadedModel->triangles()))[i].coords[j].x, (*(loadedModel->triangles()))[i].coords[j].y, (*(loadedModel->triangles()))[i].coords[j].z, mvMat,
-					pMat, viewport, &x, &y, &z);
+			gluProject((*(loadedModel->triangles()))[i].coords[j].x, (*(loadedModel->triangles()))[i].coords[j].y,
+					(*(loadedModel->triangles()))[i].coords[j].z, mvMat, pMat, viewport, &x, &y, &z);
 
 			if ((x <= hiX) && (x >= loX) && (y <= hiY) && (y >= loY)) {
 				if (keyPressed(SHIFT_KEYCODE)) {
@@ -1854,7 +1943,8 @@ void selectVertices(vec2 boxStartPosition) {
 					//selectedBone->vertices.push_back(&((*(loadedModel->triangles()))[i].coords[j]));
 				}
 			} else {
-				if ((mouseX() <= x+3.0f) && (mouseX() >= x-3.0f) && ((screenHeight()-mouseY()) <= y+3.0f) &&((screenHeight()-mouseY()) >= y-3.0f)) {
+				if ((mouseX() <= x+3.0f) && (mouseX() >= x-3.0f) && ((screenHeight()-mouseY()) <= y+3.0f)
+						&& ((screenHeight()-mouseY()) >= y-3.0f)) {
 					if (keyPressed(SHIFT_KEYCODE)) {
 						GLfloat data = -1.0f;
 						glBufferSubData(GL_ARRAY_BUFFER, sizeof(GLfloat)*((i*24*3)+(j*24)+23), sizeof(GLfloat), &data);
@@ -1950,7 +2040,8 @@ gboolean glLoop(void*) {
 		zoom *= 1.1;
 	}
 
-	if (((mouseMiddle() || (keyPressed(CONTROL_KEYCODE) && mouseLeft())) && !keyPressed(ALT_KEYCODE) && !keyPressed(SHIFT_KEYCODE)) && (viewOrientation == FREE)) {
+	if (((mouseMiddle() || (keyPressed(CONTROL_KEYCODE) && mouseLeft())) && !keyPressed(ALT_KEYCODE)
+			&& !keyPressed(SHIFT_KEYCODE)) && (viewOrientation == FREE)) {
 		vec2 amountMoved = mouseMovedAmount();
 		xRotation += (float(amountMoved.y)/3.0f)*compensation();
 		yRotation += (float(amountMoved.x)/3.0f)*compensation();
@@ -2004,7 +2095,8 @@ gboolean glLoop(void*) {
 			skeletonShader->setUniform1(EXTRA1_LOCATION, (float)selectedBone->id);
 		}
 
-		if (wireframeModeEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		if (wireframeModeEnabled) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		if (loadedModel != NULL) {
 			if (mode == ANIMATION_MODE) sendBoneModelviewMatrixUniform();
 			loadedModel->draw(0.0f, 0.0f, 0.0f);
@@ -2024,8 +2116,9 @@ gboolean glLoop(void*) {
 		if (showArrow) {
 			pushMatrix();
 				applyBoneTransforms(selectedBone);
-				if (showArrowParent) drawArrow(selectedBone->x, selectedBone->y, selectedBone->z, axis); else
-					drawArrow(selectedBone->x+selectedBone->endX, selectedBone->y+selectedBone->endY, selectedBone->z+selectedBone->endZ, axis);
+				if (showArrowParent) drawArrow(selectedBone->x, selectedBone->y, selectedBone->z, axis);
+					else drawArrow(selectedBone->x+selectedBone->endX, selectedBone->y+selectedBone->endY,
+							selectedBone->z+selectedBone->endZ, axis);
 			popMatrix();
 		} else if (showRing) {
 			pushMatrix();
@@ -2139,7 +2232,8 @@ void addAnimation() {
 
 void deleteAnimation() {
 	animations.erase(animations.begin()+currentAnimation);
-	for (unsigned i = 0; i < boneList.size(); i++) boneList[i]->animations.erase(boneList[i]->animations.begin()+currentAnimation);
+	for (unsigned i = 0; i < boneList.size(); i++)
+		boneList[i]->animations.erase(boneList[i]->animations.begin()+currentAnimation);
 	if (currentAnimation > 0) currentAnimation--;
 	if (animations.size() == 0) addAnimation(); else {
 		updateAnimationSpinButtonRange();
@@ -2239,34 +2333,41 @@ GtkWidget * createToolsWindow() {
 	row++;
 
 	viewToggleButton[TOP] = gtk_toggle_button_new_with_label("Top");
-	viewToggleHandler[TOP] = g_signal_connect(viewToggleButton[TOP], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[TOP]);
+	viewToggleHandler[TOP] = g_signal_connect(viewToggleButton[TOP], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[TOP]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[TOP], 1, row, 1, 1);
 
 	viewToggleButton[BOTTOM] = gtk_toggle_button_new_with_label("Bottom");
-	viewToggleHandler[BOTTOM] = g_signal_connect(viewToggleButton[BOTTOM], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[BOTTOM]);
+	viewToggleHandler[BOTTOM] = g_signal_connect(viewToggleButton[BOTTOM], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[BOTTOM]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[BOTTOM], 2, row, 1, 1);
 	row++;
 
 	viewToggleButton[LEFT] = gtk_toggle_button_new_with_label("Left");
-	viewToggleHandler[LEFT] = g_signal_connect(viewToggleButton[LEFT], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[LEFT]);
+	viewToggleHandler[LEFT] = g_signal_connect(viewToggleButton[LEFT], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[LEFT]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[LEFT], 1, row, 1, 1);
 
 	viewToggleButton[RIGHT] = gtk_toggle_button_new_with_label("Right");
-	viewToggleHandler[RIGHT] = g_signal_connect(viewToggleButton[RIGHT], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[RIGHT]);
+	viewToggleHandler[RIGHT] = g_signal_connect(viewToggleButton[RIGHT], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[RIGHT]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[RIGHT], 2, row, 1, 1);
 	row++;
 
 	viewToggleButton[FRONT] = gtk_toggle_button_new_with_label("Front");
-	viewToggleHandler[FRONT] = g_signal_connect(viewToggleButton[FRONT], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[FRONT]);
+	viewToggleHandler[FRONT] = g_signal_connect(viewToggleButton[FRONT], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[FRONT]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[FRONT], 1, row, 1, 1);
 
 	viewToggleButton[BACK] = gtk_toggle_button_new_with_label("Back");
-	viewToggleHandler[BACK] = g_signal_connect(viewToggleButton[BACK], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[BACK]);
+	viewToggleHandler[BACK] = g_signal_connect(viewToggleButton[BACK], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[BACK]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[BACK], 2, row, 1, 1);
 	row++;
 
 	viewToggleButton[FREE] = gtk_toggle_button_new_with_label("Free view");
-	viewToggleHandler[FREE] = g_signal_connect(viewToggleButton[FREE], "toggled", G_CALLBACK(setViewOrientation), &viewOrientationArr[FREE]);
+	viewToggleHandler[FREE] = g_signal_connect(viewToggleButton[FREE], "toggled", G_CALLBACK(setViewOrientation),
+			&viewOrientationArr[FREE]);
 	gtk_grid_attach(GTK_GRID(grid), viewToggleButton[FREE], 1, row, 3, 1);
 	row++;
 
@@ -2292,7 +2393,8 @@ GtkWidget * createBoneWindow() {
 	int row = 1;
 
 	boneCreationToggleButton = gtk_toggle_button_new_with_label("Create bones");
-	boneCreationToggleHandler = g_signal_connect(boneCreationToggleButton, "toggled", G_CALLBACK(toggleBoneCreation), NULL);
+	boneCreationToggleHandler = g_signal_connect(boneCreationToggleButton, "toggled", G_CALLBACK(toggleBoneCreation),
+			NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneCreationToggleButton, 1, row, 3, 1);
 	row++;
 
@@ -2353,14 +2455,16 @@ GtkWidget * createBoneWindow() {
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]), 180.0);
 	boneRotationLimitSpinHandler[X_AXIS][UPPER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[X_AXIS][UPPER_LIMIT], 2, row, 1, 1);
 
 	boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT] = gtk_spin_button_new_with_range(-180.0, 0.0, 0.5);
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]), -180.0);
 	boneRotationLimitSpinHandler[X_AXIS][LOWER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[X_AXIS][LOWER_LIMIT], 3, row, 1, 1);
 	row++;
 
@@ -2371,14 +2475,16 @@ GtkWidget * createBoneWindow() {
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]), 180.0);
 	boneRotationLimitSpinHandler[Y_AXIS][UPPER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[Y_AXIS][UPPER_LIMIT], 2, row, 1, 1);
 
 	boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT] = gtk_spin_button_new_with_range(-180.0, 0.0, 0.5);
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]), -180.0);
 	boneRotationLimitSpinHandler[Y_AXIS][LOWER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[Y_AXIS][LOWER_LIMIT], 3, row, 1, 1);
 	row++;
 
@@ -2389,14 +2495,16 @@ GtkWidget * createBoneWindow() {
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]), 180.0);
 	boneRotationLimitSpinHandler[Z_AXIS][UPPER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[Z_AXIS][UPPER_LIMIT], 2, row, 1, 1);
 
 	boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT] = gtk_spin_button_new_with_range(-180.0, 0.0, 0.5);
 	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]), 1);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]), -180.0);
 	boneRotationLimitSpinHandler[Z_AXIS][LOWER_LIMIT] =
-			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]), "value-changed", G_CALLBACK(updateBoneRotationLimits), NULL);
+			g_signal_connect(G_OBJECT(boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT]), "value-changed",
+					G_CALLBACK(updateBoneRotationLimits), NULL);
 	gtk_grid_attach(GTK_GRID(grid), boneRotationLimitSpinButton[Z_AXIS][LOWER_LIMIT], 3, row, 1, 1);
 	row++;
 
@@ -2491,7 +2599,8 @@ GtkWidget * createAnimationWindow() {
 	col += 3;
 
 	playAnimationToggleButton = gtk_toggle_button_new_with_label("Play Animation");
-	playAnimationToggleHandler = g_signal_connect(playAnimationToggleButton, "toggled", G_CALLBACK(togglePlayAnimation), NULL);
+	playAnimationToggleHandler = g_signal_connect(playAnimationToggleButton, "toggled", G_CALLBACK(togglePlayAnimation),
+			NULL);
 	gtk_grid_attach(GTK_GRID(grid), playAnimationToggleButton, col, 1, 3, 1);
 	col += 3;
 
