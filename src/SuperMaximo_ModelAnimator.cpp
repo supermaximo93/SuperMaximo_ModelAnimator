@@ -480,9 +480,9 @@ void loadSma(string fileName) {
 void bufferObj(GLuint * vbo, Model * model, void *) {
 	modelVbo = vbo;
 
-	GLfloat vertexArray[model->triangles()->size()*3*24];
+	GLfloat * vertexArray = new GLfloat[model->vertexCount()*24];
 	unsigned count = 0;
-	for (unsigned i = 0; i < model->triangles()->size(); i++) {
+	for (unsigned i = 0; i < model->vertexCount()/3; i++) {
 		for (short j = 0; j < 3; j++) {
 			vertexArray[count] = (*(model->triangles()))[i].coords[j].x;
 			count++;
@@ -537,7 +537,7 @@ void bufferObj(GLuint * vbo, Model * model, void *) {
 
 	glGenBuffers(1, vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*model->vertexCount()*24, vertexArray, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(VERTEX_ATTRIBUTE, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24, 0);
 	glVertexAttribPointer(NORMAL_ATTRIBUTE, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*24,
 			(const GLvoid*)(sizeof(GLfloat)*4));
@@ -572,6 +572,8 @@ void bufferObj(GLuint * vbo, Model * model, void *) {
 	glEnableVertexAttribArray(EXTRA3_ATTRIBUTE);
 	glEnableVertexAttribArray(EXTRA4_ATTRIBUTE);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	delete[] vertexArray;
 }
 
 void flagExecuteOpenFile() {
