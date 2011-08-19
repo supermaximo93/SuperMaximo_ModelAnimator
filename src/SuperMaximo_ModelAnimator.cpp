@@ -1999,7 +1999,7 @@ void applyBoneTransforms(bone * startBone) {
 	translateMatrix(-startBone->x, -startBone->y, -startBone->z);
 }
 
-void getBoneModelviewMatrices(matrix4d * matrixArray, bone * pBone = NULL) {
+void getBoneModelviewMatrices(mat4 * matrixArray, bone * pBone = NULL) {
 	if (pBone == NULL) pBone = root;
 
 	pushMatrix();
@@ -2015,7 +2015,7 @@ void getBoneModelviewMatrices(matrix4d * matrixArray, bone * pBone = NULL) {
 }
 
 void sendBoneModelviewMatrixUniform() {
-	matrix4d matrixArray[boneList.size()];
+	mat4 matrixArray[boneList.size()];
 	getBoneModelviewMatrices(matrixArray);
 	animationShader->use();
 	animationShader->setUniform16(EXTRA0_LOCATION, (float*)matrixArray, boneList.size());
