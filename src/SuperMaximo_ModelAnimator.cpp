@@ -12,8 +12,7 @@
 #include <vector>
 using namespace std;
 
-#define GL3_PROTOTYPES 1
-#include <GL3/gl3.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
 
 #include <gtk-3.0/gtk/gtk.h>
