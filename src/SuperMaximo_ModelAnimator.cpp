@@ -2052,8 +2052,8 @@ gboolean glLoop(void*) {
 
 	if (mouseRight()) {
 		vec2 amountMoved = mouseMovedAmount();
-		viewTranslation.x += amountMoved.x*0.3;
-		viewTranslation.y -= amountMoved.y*0.3;
+		viewTranslation.x += amountMoved.x/zoom;
+		viewTranslation.y -= amountMoved.y/zoom;
 	} else if (keyPressed(SPACEBAR_KEYCODE)) {
 		viewTranslation = (vec2){{0.0f}, {0.0f}};
 	}
